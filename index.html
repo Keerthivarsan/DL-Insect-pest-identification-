@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insect Pest Identification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-image"></div>
+    <div class="container">
+        <h1>Insect Pest Identification</h1>
+        <p>Upload a photo of the insect to check if it's a pest.</p>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">Identify Insect</button>
+        </form>
+        <div id="result" class="result-container">
+            <!-- Result will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const resultDiv = document.getElementById('result');
+            if (response.ok) {
+                const data = await response.json();
+                resultDiv.innerHTML = `<h2>${data.prediction}</h2>`;
+                resultDiv.className = "result-container success";
+            } else {
+                const error = await response.json();
+                resultDiv.innerHTML = `<h2>Error: ${error.error}</h2>`;
+                resultDiv.className = "result-container error";
+            }
+        });
+    </script>
+</body>
+</html>
